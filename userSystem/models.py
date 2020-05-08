@@ -15,6 +15,11 @@ class UserInfo(models.Model):
     roles = models.ManyToManyField('Role')
     permissions = models.ManyToManyField('Permissions')
 
+    class Meta:
+        verbose_name = '用户信息'
+        verbose_name_plural = verbose_name
+        db_table = "usersystem_userinfo"
+
     def __str__(self):
         return self.username
 
@@ -30,6 +35,11 @@ class Role(models.Model):
     isDelete = models.BooleanField(verbose_name='是否删除', db_column='isDelete', default=False)
     permissions = models.ManyToManyField('Permissions')
 
+    class Meta:
+        verbose_name = '角色信息'
+        verbose_name_plural = verbose_name
+        db_table = "usersystem_role"
+
     def __str__(self):
         return self.name
 
@@ -44,6 +54,11 @@ class Permissions(models.Model):
     updateTime = models.DateTimeField(verbose_name='修改时间', db_column='updateTime')
     updateUserId = models.IntegerField(verbose_name='修改人id', db_column='updateUserId')
     isDelete = models.BooleanField(verbose_name='是否删除', db_column='isDelete', default=False)
+
+    class Meta:
+        verbose_name = '权限信息'
+        verbose_name_plural = verbose_name
+        db_table = "usersystem_permissions"
 
     def __str__(self):
         return self.title
