@@ -141,8 +141,8 @@ class UserView(APIView):
             permissionList = [x for x in permissionList if x]
 
             user = models.UserInfo(
-                user=request._request.POST.get('username'),
-                pwd=request._request.POST.get('password'),
+                username=request._request.POST.get('username'),
+                password=request._request.POST.get('password'),
                 realName=request._request.POST.get('realName', ''),
                 email=request._request.POST.get('email', ''),
                 createTime=datetime.datetime.now(),
