@@ -10,7 +10,7 @@ from userSystem.cache.datacache import DataCache, PermissionCache
 from userSystem.tool.tokenCheck import Authtication
 from userSystem.tool.permissionCheck import AddUserPermission
 from userSystem import models
-from userSystem.serialzer import UserInfoSerializer
+from userSystem.serialzer import UserInfoSerializer, PermissionsSerializer
 
 
 class Hello(APIView):
@@ -75,9 +75,9 @@ class TokenCheckView(APIView):
         return Response(rsp)
 
 
-class PermissionsView(APIView):
+class GetPermissionsView(APIView):
     """
-    权限查询
+    当前用户的权限权限查询
     """
     authentication_classes = [Authtication, ]
 
@@ -96,17 +96,80 @@ class PermissionsView(APIView):
             rsp['msg'] = str(e)
         return Response(rsp)
 
+
+class PermissionsView(APIView):
+    """
+    权限的增删改查
+    """
+    authentication_classes = [Authtication, ]
+
+    def get(self, request, *args, **kwargs):
+        rsp = {'code': 200, 'msg': 'ok'}
+        try:
+            user = request.user
+            permissionAll = models.Permissions.objects.all()
+            permissionData = PermissionsSerializer(permissionAll, many=True)
+            rsp['data'] = permissionData.data
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+        return Response(rsp)
+
     def post(self, request, *args, **kwargs):
         rsp = {'code': 200, 'msg': 'ok'}
         try:
-            user = request.user  # token验证后获取的当前用户id
-            title = request._request.POST.get('title', '')  # 需要新增的权限名
-            explain = request._request.POST.get('explain', '')  # 权限说明
-            remarks = request._request.POST.get('remarks', '')
-            createTime = request._request.POST.get('createTime', '')
+            permissionDic = {
+                "title": request._request.POST.get('title', ''),  # 需要新增的权限名
+                "explain": request._request.POST.get('explain', ''),  # 权限说明
+                "remarks": request._request.POST.get('remarks', ''),
+                "createTime": datetime.datetime.now(),
+                "createUserId": request.user,  # token验证后获取的当前用户id
+                "updateTime": datetime.datetime.now(),
+                "updateUserId": request.user
+            }
+            models.Permissions.objects.create(**permissionDic)
+            rsp['msg'] = '新增权限成功'
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+        return Response(rsp)
 
-        except:
-            pass
+    def put(self, request, *args, **kwargs):
+        rsp = {'code': 200, 'msg': 'ok'}
+        try:
+            permissionid = request.data.get('permissionid')  # 要修改的权限的id
+            permissionDic = {
+                "title":  request.data.get('title',''),
+                "explain": request.data.get('explain', ''),
+                "remarks": request.data.get('remarks', ''),
+                "updateTime": datetime.datetime.now(),
+                "updateUserId": request.user
+            }
+            permission = models.Permissions.objects.filter(id=permissionid)
+            permission.update(**permissionDic)
+            rsp['msg'] = '修改权限成功'
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+
+    def delete(self, request, *args, **kwargs):
+        rsp = {'code': 200, 'msg': 'ok'}
+        try:
+            permissionid = request.data.get('permissionid')  # 要删除的权限的id
+            updateUserId = request.user
+            updateTime = datetime.datetime.now()
+            permissionObj = models.Permissions.objects.filter(id=permissionid)
+            deleteDic = {
+                "updateTime": updateTime,
+                "updateUserId": updateUserId,
+                "isDelete": True
+            }
+            permissionObj.update(**deleteDic)
+            rsp['msg'] = '改权限已经删除'
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+        return Response(rsp)
 
 
 class UserView(APIView):
