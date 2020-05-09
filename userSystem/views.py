@@ -10,7 +10,7 @@ from userSystem.cache.datacache import DataCache, PermissionCache
 from userSystem.tool.tokenCheck import Authtication
 from userSystem.tool.permissionCheck import AddUserPermission
 from userSystem import models
-from userSystem.serialzer import UserInfoSerializer, PermissionsSerializer
+from userSystem.serialzer import UserInfoSerializer, PermissionsSerializer, RoleSerializer
 
 
 class Hello(APIView):
@@ -166,6 +166,52 @@ class PermissionsView(APIView):
             }
             permissionObj.update(**deleteDic)
             rsp['msg'] = '改权限已经删除'
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+        return Response(rsp)
+
+
+class RoleView(APIView):
+    """
+    角色的增删改查
+    """
+    authentication_classes = [Authtication, ]
+
+    def get(self, request, *args, **kwargs):
+        rsp = {'code': 200, 'msg': 'ok'}
+        # 查看所有用户的信息
+        try:
+            allRoleData = models.Role.objects.all()
+            allRoleData = RoleSerializer(allRoleData, many=True)
+            rsp['data'] = allRoleData.data
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+        return Response(rsp)
+
+    def post(self, request, *args, **kwargs):
+        rsp = {'code': 200, 'msg': 'ok'}
+        try:
+            # 为新增的角色添加权限(可以为多个，用+号分割)
+            permission = request._request.POST.get('permission', '')
+            permissionList = list(set(permission.split('+')))
+            permissionList = [x for x in permissionList if x]
+
+            role = models.Role(
+                name=request._request.POST.get('name'),
+                remarks=request._request.POST.get('remarks'),
+                createTime=datetime.datetime.now(),
+                createUserId=request.user,
+                updateTime=datetime.datetime.now(),
+                updateUserId=request.user
+            )
+            role.save()
+            if permissionList:
+                permissions = models.Permissions.objects.filter(id__in=permissionList)
+                role.permissions.add(*permissions)
+                role.save()
+            rsp['msg'] = '成功添加角色'
         except Exception as e:
             rsp['code'] = 300
             rsp['msg'] = str(e)
