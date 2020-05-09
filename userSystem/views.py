@@ -107,7 +107,7 @@ class PermissionsView(APIView):
         rsp = {'code': 200, 'msg': 'ok'}
         try:
             user = request.user
-            permissionAll = models.Permissions.objects.all()
+            permissionAll = models.Permissions.objects.filter(isDelete=False)
             permissionData = PermissionsSerializer(permissionAll, many=True)
             rsp['data'] = permissionData.data
         except Exception as e:
@@ -182,7 +182,7 @@ class RoleView(APIView):
         rsp = {'code': 200, 'msg': 'ok'}
         # 查看所有用户的信息
         try:
-            allRoleData = models.Role.objects.all()
+            allRoleData = models.Role.objects.filter(isDelete=False)
             allRoleData = RoleSerializer(allRoleData, many=True)
             rsp['data'] = allRoleData.data
         except Exception as e:
@@ -280,7 +280,7 @@ class UserView(APIView):
         rsp = {'code': 200, 'msg': 'ok'}
         # 查看所有用户的信息
         try:
-            allUserData = models.UserInfo.objects.all()
+            allUserData = models.UserInfo.objects.filter(isDelete=False)
             allUserData = UserInfoSerializer(allUserData, many=True)
             rsp['data'] = allUserData.data
         except Exception as e:
