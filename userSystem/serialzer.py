@@ -14,3 +14,10 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = UserInfo
         fields = "__all__"
         depth = 3
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = "__all__"
+        depth = 2
