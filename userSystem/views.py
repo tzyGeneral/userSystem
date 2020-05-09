@@ -249,6 +249,25 @@ class RoleView(APIView):
             rsp['msg'] = str(e)
         return Response(rsp)
 
+    def delete(self, request, *args, **kwargs):
+        rsp = {'code': 200, 'msg': 'ok'}
+        roleId = request.data.get('roleId')  # 要删除的角色的id
+        updateUserId = request.user
+        updateTime = datetime.datetime.now()
+        try:
+            roleObj = models.Role.objects.filter(id=roleId)
+            deleteDic = {
+                'updateTime': updateTime,
+                'updateUserId': updateUserId,
+                'isDelete': True
+            }
+            roleObj.update(**deleteDic)
+            rsp['msg'] = '角色删除成功'
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+        return Response(rsp)
+
 
 class UserView(APIView):
     """
