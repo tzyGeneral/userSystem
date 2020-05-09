@@ -217,6 +217,38 @@ class RoleView(APIView):
             rsp['msg'] = str(e)
         return Response(rsp)
 
+    def put(self, request, *args, **kwargs):
+        rsp = {'code': 200, 'msg': 'ok'}
+        try:
+            # 修改角色的单独权限(可以为多个，用+号分割)
+            permission = request.data.get('permission', '')
+            permissionList = list(set(permission.split('+')))
+            permissionList = [x for x in permissionList if x]
+
+            roleId = request.data.get('roleId')  # 要修改的角色的id
+            name = request.data.get('name')
+            remarks = request.data.get('remarks')
+            updateTime = datetime.datetime.now()
+            updateUserId = request.user
+
+            role = models.Role.objects.get(id=roleId)
+            role.name = name
+            role.remarks = remarks
+            role.updateTime = updateTime
+            role.updateUserId = updateUserId
+
+            if permissionList:
+                permissions = models.Permissions.objects.filter(id__in=permissionList)
+                role.permissions.clear()
+                role.permissions.add(*permissions)
+            role.save()
+            rsp['msg'] = '角色信息修改成功'
+
+        except Exception as e:
+            rsp['code'] = 300
+            rsp['msg'] = str(e)
+        return Response(rsp)
+
 
 class UserView(APIView):
     """
