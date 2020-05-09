@@ -30,5 +30,6 @@ urlpatterns += [
 
     url(r'^main/api/getPermissions', views.GetPermissionsView.as_view()),
     url(r'^main/api/permission', views.PermissionsView.as_view()),
+    url(r'^main/api/role', views.RoleView.as_view()),
     url(r'^main/api/user', views.UserView.as_view())
 ]
