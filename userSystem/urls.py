@@ -28,6 +28,7 @@ urlpatterns += [
     url(r'^main/api/login', views.AuthView.as_view()),
     url(r'^main/api/checkToken', views.TokenCheckView.as_view()),
 
-    url(r'^main/api/getPermissions', views.PermissionsView.as_view()),
+    url(r'^main/api/getPermissions', views.GetPermissionsView.as_view()),
+    url(r'^main/api/permission', views.PermissionsView.as_view()),
     url(r'^main/api/user', views.UserView.as_view())
 ]
