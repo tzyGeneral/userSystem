@@ -15,6 +15,9 @@ from userSystem.serialzer import UserInfoSerializer, PermissionsSerializer, Role
 
 class Hello(APIView):
 
+    authentication_classes = [Authtication, ]
+    permission_classes = [AddUserPermission, ]  # 权限控制，交给前端判断
+
     def get(self, request, *args, **kwargs):
         rsp = {'code': 200, 'msg': 'ok'}
         try:
