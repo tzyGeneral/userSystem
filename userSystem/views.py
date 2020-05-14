@@ -44,7 +44,8 @@ class AuthView(APIView):
                 token = md5(user)
                 # 存在就更新，不存在就创建
                 cacheTool = DataCache(timeout=60*60*24)
-                token = cacheTool.createOrUpdateToken(token, {'user': obj.id, 'time': str(time.time())})
+                # 直接将queryset对象存入缓存中
+                token = cacheTool.createOrUpdateToken(token, obj)
                 rsp['token'] = token
                 rsp['msg'] = '登陆成功'
             else:
