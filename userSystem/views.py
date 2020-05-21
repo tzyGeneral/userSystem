@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from userSystem.tool.tools import md5
 from userSystem.cache.datacache import DataCache, PermissionCache
+from userSystem.cache.cacheTool import checkUserNmaeTool, checkUserInfoTool, setUserid2UserInfoToCache, setUsername2UseridToCache
 from userSystem.tool.tokenCheck import Authtication
 from userSystem.tool.permissionCheck import AddUserPermission
 from userSystem import models
@@ -37,6 +38,28 @@ class AuthView(APIView):
         try:
             user = request._request.POST.get('username')
             pwd = request._request.POST.get('password')
+
+            # 查询username -> user_id 缓存
+            user_id = checkUserNmaeTool(userName=user)
+            # 假如user_id缓存不存在
+            if not user_id:
+                # 将user_name -> user_id 存入缓存中
+                userId = setUsername2UseridToCache(username=user)
+                # 假如用户名查询不存在，则直接返回，说明用户根本不存在
+                if not userId:
+                    return
+                # 将user_id -> user_info 存入缓存中
+                setUserid2UserInfoToCache(user_id)
+
+            # 假如user_id存在
+            else:
+                # 查询user_info缓存（根据user_id）
+                user_info_check = checkUserInfoTool(user_id)
+                # 不存在则从DB根据user_id查询user_info（包含角色，权限）
+                if not user_info_check:
+                    # 将user_info 存入缓存
+                    setUserid2UserInfoToCache(user_id)
+            # 确认用户密码
             obj = models.UserInfo.objects.filter(username=user, password=pwd).first()
             # 用户存在且没有被删除
             if obj is not None and not obj.isDelete:
