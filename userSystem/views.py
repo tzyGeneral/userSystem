@@ -49,7 +49,7 @@ class AuthView(APIView):
                 if not userId:
                     return
                 # 将user_id -> user_info 存入缓存中
-                setUserid2UserInfoToCache(user_id)
+                setUserid2UserInfoToCache(userId)
 
             # 假如user_id存在
             else:
