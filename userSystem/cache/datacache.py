@@ -16,6 +16,15 @@ class DataCache:
             cache.set('hello', result, self.timeout)
         return result
 
+    def setCache(self, key: str, value):
+        """
+        设置一个缓存
+        :param key:
+        :param value:
+        :return:
+        """
+        cache.set(key, value, self.timeout)
+
     def createOrUpdateToken(self, key: str, dic: dict):
         cache.set(key, dic, self.timeout)
         return key
