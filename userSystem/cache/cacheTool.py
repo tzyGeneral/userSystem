@@ -42,7 +42,7 @@ def setUsername2UseridToCache(username: str):
     """
     key = 'usernameCache+' + str(username)
     # 通过用户名user_name查询用户的user_id
-    user = UserInfo.objects.get(username=username)
+    user = UserInfo.objects.filter(username=username).first()
     if user:
         # 将user_id存入缓存中， key：user_name, value: user_id
         DataCache(timeout=60 * 60 * 3).setCache(key=key, value=user.id)
