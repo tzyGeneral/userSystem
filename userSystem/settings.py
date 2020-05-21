@@ -163,6 +163,15 @@ CACHES = {
         },
         'KEY_PREFIX': 'user_permission_cache'
     },
+    # user_token -> user_id 缓存
+    'user_token_cache': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        'KEY_PREFIX': 'user_token_cache'
+    },
 
 }
 
