@@ -1,5 +1,4 @@
 from userSystem.models import *
-from userSystem.cache.datacache import RolesCache
 
 
 class AddUserPermission(object):
