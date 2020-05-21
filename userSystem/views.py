@@ -35,6 +35,7 @@ class AuthView(APIView):
     """
     def post(self, request, *args, **kwargs):
         rsp = {'code': 200, 'msg': 'ok'}
+        errRsp = {'code': 300, 'msg': '用户名不存在'}
         try:
             user = request._request.POST.get('username')
             pwd = request._request.POST.get('password')
@@ -47,7 +48,7 @@ class AuthView(APIView):
                 userId = setUsername2UseridToCache(username=user)
                 # 假如用户名查询不存在，则直接返回，说明用户根本不存在
                 if not userId:
-                    return
+                    return Response(errRsp)
                 # 将user_id -> user_info 存入缓存中
                 setUserid2UserInfoToCache(userId)
 
