@@ -6,8 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from userSystem.tool.tools import md5
-from userSystem.cache.datacache import DataCache, PermissionCache
-from userSystem.cache.cacheTool import checkUserNmaeTool, checkUserInfoTool, setUserid2UserInfoToCache, setUsername2UseridToCache
+from userSystem.cache.datacache import DataCache2
+from userSystem.cache.cacheTool import checkUserNmaeTool, checkUserInfoTool, setUserid2UserInfoToCache, setUsername2UseridToCache, getPermissionFromCache
 from userSystem.tool.tokenCheck import Authtication
 from userSystem.tool.permissionCheck import AddUserPermission
 from userSystem import models
@@ -16,13 +16,13 @@ from userSystem.serialzer import UserInfoSerializer, PermissionsSerializer, Role
 
 class Hello(APIView):
 
-    authentication_classes = [Authtication, ]
-    permission_classes = [AddUserPermission, ]  # 权限控制，交给前端判断
+    # authentication_classes = [Authtication, ]
+    # permission_classes = [AddUserPermission, ]  # 权限控制，交给前端判断
 
     def get(self, request, *args, **kwargs):
         rsp = {'code': 200, 'msg': 'ok'}
         try:
-            rsp['data'] = DataCache().cacheTest()
+            rsp['data'] = DataCache2().checkKey('1')
         except Exception as e:
             rsp['code'] = 401
             rsp['msg'] = str(e)
@@ -67,9 +67,9 @@ class AuthView(APIView):
                 # 为登陆用户创建token
                 token = md5(user)
                 # 存在就更新，不存在就创建
-                cacheTool = DataCache(timeout=60*60*24)
+                cacheTool = DataCache2(cacheName='user_token_cache', timeout=60*60*24)
                 # 直接将queryset对象存入缓存中
-                token = cacheTool.createOrUpdateToken(token, obj)
+                token = cacheTool.setCache(key=token, value=obj)
                 rsp['token'] = token
                 rsp['msg'] = '登陆成功'
             else:
@@ -92,8 +92,8 @@ class TokenCheckView(APIView):
             rsp['code'] = 300
             rsp['msg'] = '请携带token请求'
         else:
-            cacheTool = DataCache(timeout=60 * 60 * 24)
-            tokenCheck = cacheTool.getTokenFromCache(token)
+            cacheTool = DataCache2(cacheName='user_token_cache', timeout=60*60*24)
+            tokenCheck = cacheTool.getCache(key=token)
             if not tokenCheck:
                 rsp['code'] = 301
                 rsp['msg'] = 'token过期请重新登陆'
@@ -115,9 +115,7 @@ class GetPermissionsView(APIView):
             user = request.user
             data = request.auth
             # 通过token拿到用户的信息，然后去取权限各种信息
-            cacheKey = 'permissionCache+'+str(user)
-            cacheTool = PermissionCache()
-            userPermission = cacheTool.getPermissionFromCache(cacheKey)
+            userPermission = getPermissionFromCache(user_id=user)
             rsp['data'] = userPermission
         except Exception as e:
             rsp['code'] = 300
