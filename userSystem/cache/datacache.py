@@ -16,6 +16,15 @@ class DataCache:
             cache.set('hello', result, self.timeout)
         return result
 
+    def cleanKeyStr(self, key: str):
+        """
+        清理key的不规则写法导致存入缓存失败
+        :param key:
+        :return:
+        """
+        key = key.replace(' ', '').strip()
+        return key
+
     def setCache(self, key: str, value):
         """
         设置一个缓存
@@ -23,6 +32,7 @@ class DataCache:
         :param value:
         :return:
         """
+        key = self.cleanKeyStr(key)
         cache.set(key, value, self.timeout)
 
     def createOrUpdateToken(self, key: str, dic: dict):
