@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
+from django.views.decorators.cache import cache_page
 
 from userSystem import views
 
@@ -29,7 +30,7 @@ urlpatterns += [
     url(r'^main/api/checkToken', views.TokenCheckView.as_view()),
 
     url(r'^main/api/getPermissions', views.GetPermissionsView.as_view()),
-    url(r'^main/api/permission', views.PermissionsView.as_view()),
-    url(r'^main/api/role', views.RoleView.as_view()),
-    url(r'^main/api/user', views.UserView.as_view())
+    url(r'^main/api/permission', cache_page(60)(views.PermissionsView.as_view())),
+    url(r'^main/api/role', cache_page(60)(views.RoleView.as_view())),
+    url(r'^main/api/user', cache_page(60)(views.UserView.as_view()))
 ]
